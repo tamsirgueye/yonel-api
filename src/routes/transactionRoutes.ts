@@ -12,7 +12,7 @@ export const transactionRoutes = [{
     action: "one"
 }, {
     method: "post",
-    route: "/transactions/emetteur-:idEmetteur/recepteur-:idRecepteur/paysOrigine-:idPaysOrigine/paysDestination-:idPaysDestination/deviseOrigine-:idDeviseOrigine/deviseDestination-:idDeviseDestination",
+    route: "/transactions",
     controller: TransactionController,
     action: "save"
 }, {

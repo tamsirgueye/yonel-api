@@ -77,12 +77,12 @@ export class TransactionController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idEmetteur = request.params.idEmetteur
-        const idRecepteur = request.params.idRecepteur
-        const idPaysOrigine = request.params.idPaysOrigine
-        const idPaysDestination = request.params.idPaysDestination
-        const idDeviseOrigine = request.params.idDeviseOrigine
-        const idDeviseDestination = request.params.idDeviseDestination
+        const idEmetteur = request.body.idEmetteur
+        const idRecepteur = request.body.idRecepteur
+        const idPaysOrigine = request.body.idPaysOrigine
+        const idPaysDestination = request.body.idPaysDestination
+        const idDeviseOrigine = request.body.idDeviseOrigine
+        const idDeviseDestination = request.body.idDeviseDestination
 
         if(idEmetteur == idRecepteur) {
             response.status(StatusCodes.BAD_REQUEST)
