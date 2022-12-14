@@ -21,13 +21,13 @@ export class Transaction {
     @Column()
     dateEnvoi: Date = new Date()
 
-    @Column()
+    @Column({ type: "decimal", precision: 2 })
     montantReception: number
 
-    @Column()
+    @Column({ type: "decimal", precision: 2 })
     frais: number
 
-    @Column()
+    @Column({ type: "decimal", precision: 2 })
     montantTotal: number
 
     //@Column({ type: "enum", enum: StatutTransaction, default: StatutTransaction.TRANSMITTED })
