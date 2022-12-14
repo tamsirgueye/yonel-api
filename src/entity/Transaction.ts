@@ -34,16 +34,25 @@ export class Transaction {
     @Column()
     statut: string = 'transmitted'
 
-    @ManyToOne(() => Client, (client) => client.transactions, { nullable: false })
-    client: Client
+    @ManyToOne(() => Client, (client) => client.transactionsEmises, { nullable: false })
+    emetteur: Client
+
+    @ManyToOne(() => Client, (client) => client.transactionsRecues, { nullable: false })
+    recepteur: Client
 
     @OneToOne(() => Paiement, (paiement) => paiement.transaction, { cascade: true })
     paiement: Paiement
 
-    @ManyToOne(() => Devise, (devise) => devise.transactions, { nullable: false })
-    devise: Devise
+    @ManyToOne(() => Devise, (devise) => devise.transactionsOrigine, { nullable: false })
+    deviseOrigine: Devise
 
-    @ManyToOne(() => Pays, (pays) => pays.transactions, { nullable: false })
-    pays: Pays
+    @ManyToOne(() => Devise, (devise) => devise.transactionsDestination, { nullable: false })
+    deviseDestination: Devise
+
+    @ManyToOne(() => Pays, (pays) => pays.transactionsOrigine, { nullable: false })
+    paysOrigine: Pays
+
+    @ManyToOne(() => Pays, (pays) => pays.transactionsDestination, { nullable: false })
+    paysDestination: Pays
 
 }

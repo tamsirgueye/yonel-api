@@ -25,7 +25,10 @@ export class Client {
     @Column()
     telephone: string
 
-    @OneToMany(() => Transaction, transaction => transaction.client, { cascade: true })
-    transactions: Transaction[]
+    @OneToMany(() => Transaction, transaction => transaction.emetteur, { cascade: true })
+    transactionsEmises: Transaction[]
+
+    @OneToMany(() => Transaction, transaction => transaction.recepteur, { cascade: true })
+    transactionsRecues: Transaction[]
 
 }

@@ -22,7 +22,10 @@ export class Devise {
     @Column()
     tauxFrais: number
 
-    @OneToMany(() => Transaction, (transaction) => transaction.devise)
-    transactions: Transaction[]
+    @OneToMany(() => Transaction, (transaction) => transaction.deviseOrigine)
+    transactionsOrigine: Transaction[]
+
+    @OneToMany(() => Transaction, (transaction) => transaction.deviseDestination)
+    transactionsDestination: Transaction[]
 
 }

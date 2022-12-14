@@ -14,8 +14,11 @@ export class Pays {
     @Column()
     nom: string
 
-    @OneToMany(() => Transaction, (transaction) => transaction.pays)
-    transactions: Transaction[]
+    @OneToMany(() => Transaction, (transaction) => transaction.paysOrigine)
+    transactionsOrigine: Transaction[]
+
+    @OneToMany(() => Transaction, (transaction) => transaction.paysDestination)
+    transactionsDestination: Transaction[]
 
     @OneToMany(() => Ville, (ville) => ville.pays)
     villes: Ville[]

@@ -22,26 +22,32 @@ export class TransactionController {
      */
     async all(request: Request, response: Response, next: NextFunction) {
         const idClient = request.params.idClient
-        await this.clientRepository.findOneBy({ id: idClient }).then(c => {
-            if(c === null) {
-                response.sendStatus(StatusCodes.NOT_FOUND)
-                return
+        return await this.clientRepository.findOneBy({ id: idClient }).then(async client => {
+            if(client === null) {
+                response.status(StatusCodes.NOT_FOUND)
+                return { message: "Client introuvable" }
             }
-            this.transactionRepository.find({ where: { client: c } }).then(ts => {
-                response.send(ts)
-                return
+            return await this.transactionRepository.find({
+                where: [
+                    { emetteur: client },
+                    { recepteur: client }],
+                relations: [
+                    'emetteur', 'recepteur', 'paysOrigine', 'paysDestination', 'deviseOrigine', 'deviseDestination'
+                ] }
+            ).then(transactions => {
+                return transactions
             }).catch(e => {
-                response.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
+                response.status(StatusCodes.INTERNAL_SERVER_ERROR)
                 return
             })
         }).catch(e => {
-            response.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR)
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR)
             return
         })
     }
 
     /**
-     * Retourne une transaction et le client concerné
+     * Retourne une transaction
      * @param request
      * @param response
      * @param next
@@ -50,14 +56,16 @@ export class TransactionController {
         const transaction = await this.transactionRepository
             .createQueryBuilder('t')
             .where({ id: request.params.id })
-            .leftJoinAndSelect('t.client', 'c')
-            .leftJoinAndSelect('t.paiement', 'p')
-            .leftJoinAndSelect('t.devise', 'd')
-            .leftJoinAndSelect('t.pays', 'pays')
+            .leftJoinAndSelect('t.emetteur', 'emetteur')
+            .leftJoinAndSelect('t.recepteur', 'recepteur')
+            .leftJoinAndSelect('t.paysOrigine', 'paysOrigine')
+            .leftJoinAndSelect('t.paysDestination', 'paysDestination')
+            .leftJoinAndSelect('t.deviseOrigine', 'deviseOrigine')
+            .leftJoinAndSelect('t.deviseDestination', 'deviseDestination')
             .getOne()
         if (!transaction) {
-            response.sendStatus(StatusCodes.NOT_FOUND)
-            return
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Transaction introuvable" }
         }
         return transaction
     }
@@ -69,31 +77,60 @@ export class TransactionController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idClient = request.params.idClient
-        const idPays = request.params.idPays
-        const idDevise = request.params.idDevise
-        return await this.clientRepository.findOneBy({ id: idClient }).then(async client => {
-            if(client === null) {
+        const idEmetteur = request.params.idEmetteur
+        const idRecepteur = request.params.idRecepteur
+        const idPaysOrigine = request.params.idPaysOrigine
+        const idPaysDestination = request.params.idPaysDestination
+        const idDeviseOrigine = request.params.idDeviseOrigine
+        const idDeviseDestination = request.params.idDeviseDestination
+
+        if(idEmetteur == idRecepteur) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Émetteur et récepteur ne peuvent pas être identiques" }
+        }
+
+        return await this.clientRepository.find({
+            where: [
+                { id: idEmetteur },
+                { id: idRecepteur }
+            ]
+        }).then(async clients => {
+            if(clients.length < 2) {
                 response.status(StatusCodes.NOT_FOUND)
-                return { message: "Client non trouvé" }
+                return { message: "Émetteur et/ou récepteur introuvable(s)" }
             }
 
-            return await this.paysRepository.findOneBy({ id: idPays }).then(async pays => {
-                if(pays === null) {
+            return await this.paysRepository.find({
+                where: [
+                    { id: idPaysOrigine },
+                    { id: idPaysDestination }
+                ]
+            }).then(async pays => {
+                // Tester si on a un pays d’origine et de destination
+                if(!(pays.length == 2 || (pays.length == 1 && idPaysOrigine == idPaysDestination))) {
                     response.status(StatusCodes.NOT_FOUND)
-                    return { message: "Pays non trouvé" }
+                    return { message: "Pays origine et/ou pays destination introuvable(s)" }
                 }
 
-                return await this.deviseRepository.findOneBy({ id: idDevise }).then(devise => {
-                    if(devise === null) {
+                return await this.deviseRepository.find({
+                    where: [
+                        { id: idDeviseOrigine },
+                        { id: idDeviseDestination }
+                    ]
+                }).then(devises => {
+                    // Tester si on a une devise d’origine et de destination
+                    if(!(devises.length == 2 || (devises.length == 1 && idDeviseOrigine == idDeviseDestination))) {
                         response.status(StatusCodes.NOT_FOUND)
-                        return { message: "Devise non trouvé" }
+                        return { message: "Devise origine et/ou devise destination introuvable(s)" }
                     }
 
                     let transaction = new Transaction()
-                    transaction.client = client
-                    transaction.pays = pays
-                    transaction.devise = devise
+                    transaction.emetteur = clients.find((client) => client.id == idEmetteur)
+                    transaction.recepteur = clients.find((client) => client.id == idRecepteur)
+                    transaction.paysOrigine = pays.find((pays) => pays.id == idPaysOrigine)
+                    transaction.paysDestination = pays.find((pays) => pays.id == idPaysDestination)
+                    transaction.deviseOrigine = devises.find((devise) => devise.id == idDeviseOrigine)
+                    transaction.deviseDestination = devises.find((devise) => devise.id == idDeviseDestination)
                     transaction.montantReception = request.body.montantReception
                     transaction.frais = request.body.frais
                     transaction.montantTotal = request.body.montantTotal
@@ -134,7 +171,8 @@ export class TransactionController {
     async remove(request: Request, response: Response, next: NextFunction) {
         let transactionToRemove = await this.transactionRepository.findOneBy({ id: request.params.id })
         if (!transactionToRemove) {
-            response.sendStatus(StatusCodes.NOT_FOUND)
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Transaction introuvable" }
         }
         await this.transactionRepository.remove(transactionToRemove)
         response.sendStatus(StatusCodes.NO_CONTENT)
