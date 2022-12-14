@@ -187,7 +187,7 @@ export class TransactionController {
     async pay(request: Request, response: Response, next: NextFunction) {
         const transaction = await this.transactionRepository
             .createQueryBuilder('t')
-            .where({ id: request.params.id })
+            .where({ id: request.body.idTransaction })
             .leftJoinAndSelect('t.client', 'c')
             .leftJoinAndSelect('t.paiement', 'p')
             .getOne()

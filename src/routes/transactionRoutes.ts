@@ -22,7 +22,7 @@ export const transactionRoutes = [{
     action: "remove"
 }, {
     method: "post",
-    route: "/transactions/payer/:id",
+    route: "/transactions/payer",
     controller: TransactionController,
     action: "pay"
 }, {
