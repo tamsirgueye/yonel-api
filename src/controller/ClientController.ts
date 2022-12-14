@@ -30,7 +30,7 @@ export class ClientController {
             response.status(StatusCodes.CREATED)
             return client
         }).catch(e => {
-            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les donnée envoyées" }
         })
 

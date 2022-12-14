@@ -33,7 +33,7 @@ export class PaysController {
             response.status(StatusCodes.CREATED)
             return pays
         }).catch(e => {
-            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les donnée envoyées" }
         })
 

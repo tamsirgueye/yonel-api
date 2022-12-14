@@ -30,7 +30,7 @@ export class DeviseController {
             response.status(StatusCodes.CREATED)
             return devise
         }).catch(e => {
-            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les donnée envoyées" }
         })
 

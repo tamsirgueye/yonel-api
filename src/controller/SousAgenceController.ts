@@ -89,7 +89,7 @@ export class SousAgenceController {
                     response.status(StatusCodes.CREATED)
                     return sa
                 }).catch(e => {
-                    response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+                    response.status(StatusCodes.BAD_REQUEST)
                     return { message: "Vérifiez les données" }
                 })
             }).catch(e => {

@@ -27,7 +27,7 @@ export class UserController {
                 .send({user: u})
             return
         }).catch(e => {
-            response.sendStatus(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.sendStatus(StatusCodes.BAD_REQUEST)
         })
 
     }

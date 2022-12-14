@@ -39,7 +39,7 @@ export class AgenceController {
             response.status(StatusCodes.CREATED)
             return agence
         }).catch(e => {
-            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les donnée envoyées" }
         })
 

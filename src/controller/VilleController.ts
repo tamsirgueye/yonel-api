@@ -76,7 +76,7 @@ export class VilleController {
                 response.status(StatusCodes.CREATED)
                 return v
             }).catch(e => {
-                response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+                response.status(StatusCodes.BAD_REQUEST)
                 return { message: "Vérifiez les données" }
             })
         }).catch(e => {

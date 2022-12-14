@@ -107,7 +107,7 @@ export class TransactionController {
                         response.status(StatusCodes.CREATED)
                         return transaction
                     }).catch(e => {
-                        response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+                        response.status(StatusCodes.BAD_REQUEST)
                         return { message: "Vérifiez les données" }
                     })
                 }).catch(e => {
@@ -172,7 +172,7 @@ export class TransactionController {
         return this.transactionRepository.save(transaction).then(transaction => {
             return transaction
         }).catch(e => {
-            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les données" }
         })
     }
