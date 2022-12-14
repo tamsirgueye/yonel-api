@@ -205,7 +205,7 @@ export class TransactionController {
         paiement.typePieceIdentite = request.body.typePieceIdentite
         paiement.numeroPieceIdentite = request.body.numeroPieceIdentite
         transaction.paiement = paiement
-        transaction.statut = "payed"
+        transaction.statut = "paid"
 
         return this.transactionRepository.save(transaction).then(transaction => {
             return transaction
