@@ -10,12 +10,22 @@ export class VilleController {
     private paysRepository = AppDataSource.getRepository(Pays)
 
     /**
-     * Retourne toutes les villes d’un pays
+     * Retourne toutes les villes
      * @param request
      * @param response
      * @param next
      */
     async all(request: Request, response: Response, next: NextFunction) {
+        return this.villeRepository.find()
+    }
+
+    /**
+     * Retourne toutes les villes d’un pays
+     * @param request
+     * @param response
+     * @param next
+     */
+    async allFromOnePays(request: Request, response: Response, next: NextFunction) {
         const idPays = request.params.idPays
         return await this.paysRepository.findOneBy({ id: idPays }).then(p => {
             if(p === null) {
@@ -60,7 +70,11 @@ export class VilleController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idPays = request.params.idPays
+        const idPays = request.body.idPays
+        if(!idPays) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Le pays est obligatoire" }
+        }
         return await this.paysRepository.findOneBy({ id: idPays }).then(p => {
             if(p === null) {
                 response.status(StatusCodes.NOT_FOUND)
@@ -99,6 +113,26 @@ export class VilleController {
             return { message: "Pour supprimer cette ville vous devez d'abord supprimer ses sous agences" }
         })
         
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const idVille = request.params.id
+        let villeToUpdate = await this.villeRepository.findOneBy({ id: idVille })
+        if (!villeToUpdate) {
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Ville introuvable" }
+        }
+
+        villeToUpdate.code = request.body.code
+        villeToUpdate.nom = request.body.nom
+
+        return this.villeRepository.save(villeToUpdate).then(villeUpdated => {
+            return villeUpdated
+        }).catch(e => {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Vérifiez les donnée envoyées" }
+        })
+
     }
 
 }

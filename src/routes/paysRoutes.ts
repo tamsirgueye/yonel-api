@@ -20,4 +20,9 @@ export const paysRoutes = [{
     route: "/pays/:id",
     controller: PaysController,
     action: "remove"
+}, {
+    method: "put",
+    route: "/pays/:id",
+    controller: PaysController,
+    action: "update"
 }]

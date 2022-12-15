@@ -4,12 +4,24 @@ import { SousAgence } from "../entity/SousAgence"
 import { Agence } from "../entity/Agence"
 import { Ville } from "../entity/Ville"
 import { StatusCodes } from "http-status-codes"
+import { User } from "../entity/User";
 
 export class SousAgenceController {
 
     private sousAgenceRepository = AppDataSource.getRepository(SousAgence)
     private agenceRepository = AppDataSource.getRepository(Agence)
     private villeRepository = AppDataSource.getRepository(Ville)
+    private userRepository = AppDataSource.getRepository(User)
+
+    /**
+     * Retourne toutes les sous agences
+     * @param request
+     * @param response
+     * @param next
+     */
+    async all(request: Request, response: Response, next: NextFunction) {
+        return this.sousAgenceRepository.find()
+    }
 
     /**
      * Retourne toutes les sous agences d’une agence
@@ -17,7 +29,7 @@ export class SousAgenceController {
      * @param response
      * @param next
      */
-    async all(request: Request, response: Response, next: NextFunction) {
+    async allFromOneAgence(request: Request, response: Response, next: NextFunction) {
         const idAgence = request.params.idAgence
         return await this.agenceRepository.findOneBy({ id: idAgence }).then(a => {
             if(a === null) {
@@ -63,8 +75,12 @@ export class SousAgenceController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idAgence = request.params.idAgence
-        const idVille = request.params.idVille
+        const idAgence = request.body.idAgence
+        const idVille = request.body.idVille
+        if(!(idAgence && idVille)) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Agence et ville obligatoire" }
+        }
         return await this.agenceRepository.findOneBy({ id: idAgence }).then(async a => {
             if (a === null) {
                 response.status(StatusCodes.NOT_FOUND)
@@ -116,6 +132,66 @@ export class SousAgenceController {
             return {}
         })
         
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const idSousAgence = request.params.id
+        let sousAgenceToUpdate = await this.agenceRepository.findOneBy({ id: idSousAgence })
+        if (!sousAgenceToUpdate) {
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Sous agence introuvable" }
+        }
+
+        sousAgenceToUpdate.nom = request.body.nom
+        // sousAgenceToUpdate.balance = request.body.balance
+        sousAgenceToUpdate.statut = request.body.statut
+
+        return this.sousAgenceRepository.save(sousAgenceToUpdate).then(sousAgenceUpdated => {
+            return sousAgenceUpdated
+        }).catch(e => {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Vérifiez les donnée envoyées" }
+        })
+
+    }
+
+    async addUser(request: Request, response: Response, next: NextFunction) {
+        const idSousAgence = request.body.idSousAgence
+        const idUser = request.body.idUser
+
+        if(!idSousAgence) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Le sous agence est obligatoire" }
+        }
+
+        const sousAgence = await this.sousAgenceRepository.findOneBy({ id: idSousAgence })
+        if(!sousAgence) {
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Sous agence introuvable" }
+        }
+
+        if(!idUser) {
+            let user = new User()
+            user.login = request.body.login
+            user.password = request.body.password
+            user.sousAgence = sousAgence
+
+            return this.userRepository.save(user).then(user => {
+                response.status(StatusCodes.CREATED)
+                return user
+            }).catch(e => {
+                response.status(StatusCodes.BAD_REQUEST)
+                return { message: "Veuillez renseigner l'utilisateur" }
+            })
+        }
+
+        return this.userRepository.findOneBy({ id: idUser }).then(user => {
+            user.sousAgence = sousAgence
+            return this.userRepository.save(user)
+        }).catch(e => {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Utilisateur introuvable" }
+        })
     }
 
 }

@@ -15,12 +15,22 @@ export class TransactionController {
     private deviseRepository = AppDataSource.getRepository(Devise)
 
     /**
-     * Retourne toutes les transactions d’un client
+     * Récupère toutes les transactions
      * @param request
      * @param response
      * @param next
      */
     async all(request: Request, response: Response, next: NextFunction) {
+        return this.transactionRepository.find()
+    }
+
+    /**
+     * Retourne toutes les transactions d’un client
+     * @param request
+     * @param response
+     * @param next
+     */
+    async allFromOneClient(request: Request, response: Response, next: NextFunction) {
         const idClient = request.params.idClient
         return await this.clientRepository.findOneBy({ id: idClient }).then(async client => {
             if(client === null) {

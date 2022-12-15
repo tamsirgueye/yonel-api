@@ -20,4 +20,9 @@ export const deviseRoutes = [{
     route: "/devises/:id",
     controller: DeviseController,
     action: "remove"
+}, {
+    method: "put",
+    route: "/devises/:id",
+    controller: DeviseController,
+    action: "update"
 }]

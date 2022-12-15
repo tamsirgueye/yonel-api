@@ -2,9 +2,14 @@ import { VilleController } from "../controller/VilleController";
 
 export const villeRoutes = [{
     method: "get",
-    route: "/villes/pays-:idPays",
+    route: "/villes",
     controller: VilleController,
     action: "all"
+}, {
+    method: "get",
+    route: "/villes/pays/:idPays",
+    controller: VilleController,
+    action: "allFromOnePays"
 }, {
     method: "get",
     route: "/villes/:id",
@@ -12,7 +17,7 @@ export const villeRoutes = [{
     action: "one"
 }, {
     method: "post",
-    route: "/villes/pays-:idPays",
+    route: "/villes",
     controller: VilleController,
     action: "save"
 }, {
@@ -20,4 +25,9 @@ export const villeRoutes = [{
     route: "/villes/:id",
     controller: VilleController,
     action: "remove"
+}, {
+    method: "put",
+    route: "/villes/:id",
+    controller: VilleController,
+    action: "update"
 }]

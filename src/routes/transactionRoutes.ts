@@ -2,9 +2,14 @@ import { TransactionController } from "../controller/TransactionController";
 
 export const transactionRoutes = [{
     method: "get",
-    route: "/transactions/client/:idClient",
+    route: "/transactions",
     controller: TransactionController,
     action: "all"
+}, {
+    method: "get",
+    route: "/transactions/client/:idClient",
+    controller: TransactionController,
+    action: "allFromOneClient"
 }, {
     method: "get",
     route: "/transactions/:id",

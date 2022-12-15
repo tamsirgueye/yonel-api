@@ -7,13 +7,13 @@ export class Devise {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({ unique: true })
     code: string
 
-    @Column()
+    @Column({ unique: true })
     nom: string
 
-    @Column()
+    @Column({ unique: true })
     symbole: string
 
     @Column({ type: "float", precision: 3, scale: 3 })

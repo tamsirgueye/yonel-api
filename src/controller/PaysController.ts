@@ -25,11 +25,19 @@ export class PaysController {
 
     async save(request: Request, response: Response, next: NextFunction) {
         // Lorsque undefined est passé findOneBy récupère le premier trouvé
-        if(await this.paysRepository.findOneBy({ nom: String(request.body.nom) }) !== null) {
+        if(await this.paysRepository.findOneBy([
+            { nom: String(request.body.nom) },
+            { code: String(request.body.code) }
+        ]) !== null) {
             response.status(StatusCodes.UNPROCESSABLE_ENTITY)
-            return { message: "Ce nom de pays existe déjà dans la base de données" }
+            return { message: "le nom et/ou le code de pays existe(nt) déjà dans la base de données" }
         }
-        return this.paysRepository.save(request.body).then(pays => {
+
+        let pays = new Pays()
+        pays.code = request.body.code
+        pays.nom = request.body.nom
+
+        return this.paysRepository.save(pays).then(pays => {
             response.status(StatusCodes.CREATED)
             return pays
         }).catch(e => {
@@ -52,6 +60,39 @@ export class PaysController {
             return { message: "Pour supprimer ce pays vous devez d'abord supprimer ses transactions et ses villes" }
         })
         
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const idPays = request.params.id
+        let paysToUpdate = await this.paysRepository.findOneBy({ id: idPays })
+        if (!paysToUpdate) {
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "Pays introuvable" }
+        }
+
+        if(await this.paysRepository
+            .createQueryBuilder('p')
+            .where("p.id != :id", { id: idPays })
+            .andWhere([
+                { code: request.body.code },
+                { nom: request.body.nom }
+            ])
+            .getOne()
+        ) {
+            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            return { message: "Le code et/ou le nom existe(nt) déjà dans la base" }
+        }
+
+        paysToUpdate.code = request.body.code
+        paysToUpdate.nom = request.body.nom
+
+        return this.paysRepository.save(paysToUpdate).then(paysUpdated => {
+            return paysUpdated
+        }).catch(e => {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Vérifiez les donnée envoyées" }
+        })
+
     }
 
 }

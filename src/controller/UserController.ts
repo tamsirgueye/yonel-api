@@ -21,13 +21,22 @@ export class UserController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        this.userRepository.save(request.body).then(u => {
-            response
-                .status(StatusCodes.CREATED)
-                .send({user: u})
-            return
+        // Lorsque undefined est passé findOneBy récupère le premier trouvé
+        if(await this.userRepository.findOneBy({ login: String(request.body.login) }) !== null) {
+            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            return { message: "Le login est déjà utilisé" }
+        }
+
+        let user = new User()
+        user.login = request.body.login
+        user.password = request.body.password
+
+        return this.userRepository.save(user).then(user => {
+            response.status(StatusCodes.CREATED)
+            return user
         }).catch(e => {
-            response.sendStatus(StatusCodes.BAD_REQUEST)
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Vérifiez les données" }
         })
 
     }
@@ -39,6 +48,26 @@ export class UserController {
         }
         await this.userRepository.remove(userToRemove)
         response.sendStatus(StatusCodes.NO_CONTENT)
+    }
+
+    async update(request: Request, response: Response, next: NextFunction) {
+        const idUser = request.params.id
+        let userToUpdate = await this.userRepository.findOneBy({ id: idUser })
+        if (!userToUpdate) {
+            response.status(StatusCodes.NOT_FOUND)
+            return { message: "User introuvable" }
+        }
+
+        userToUpdate.login = request.body.login
+        userToUpdate.password = request.body.password
+
+        return this.userRepository.save(userToUpdate).then(userUpdated => {
+            return userUpdated
+        }).catch(e => {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Vérifiez les donnée envoyées" }
+        })
+
     }
 
 }

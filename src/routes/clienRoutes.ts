@@ -20,4 +20,9 @@ export const clientRoutes = [{
     route: "/clients/:id",
     controller: ClientController,
     action: "remove"
+}, {
+    method: "put",
+    route: "/clients/:id",
+    controller: ClientController,
+    action: "update"
 }]

@@ -8,10 +8,10 @@ export class Pays {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column({ unique: true })
     code: string
 
-    @Column()
+    @Column({ unique: true })
     nom: string
 
     @OneToMany(() => Transaction, (transaction) => transaction.paysOrigine)
