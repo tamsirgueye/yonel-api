@@ -16,10 +16,10 @@ export class Devise {
     @Column()
     symbole: string
 
-    @Column({ type: "decimal", precision: 2, default: 0.0 })
+    @Column({ type: "float", precision: 3, scale: 3 })
     tauxConversion: number
 
-    @Column({ type: "decimal", precision: 2 })
+    @Column({ type: "float", precision: 3, scale: 3 })
     tauxFrais: number
 
     @OneToMany(() => Transaction, (transaction) => transaction.deviseOrigine)

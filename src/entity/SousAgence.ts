@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany} from "typeorm"
 import { Agence } from "./Agence";
 import { Ville } from "./Ville"
+import {User} from "./User";
 
 @Entity()
 export class SousAgence {
@@ -25,4 +26,7 @@ export class SousAgence {
 
     @ManyToOne(() => Ville, (ville) => ville.sousAgences, { nullable: false })
     ville: Ville
+
+    @OneToMany(() => User, (user) => user.sousAgence)
+    users: User[]
 }

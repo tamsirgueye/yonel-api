@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Agence } from "./Agence";
+import { SousAgence } from "./SousAgence";
 
 @Entity()
 export class User {
@@ -7,12 +9,18 @@ export class User {
     id: number
 
     @Column()
-    firstName: string
+    login: string
 
     @Column()
-    lastName: string
+    password: string
+
+    @ManyToOne(() => Agence, (agence) => agence.users)
+    agence: Agence
+
+    @ManyToOne(() => SousAgence, (sousAgence) => sousAgence.users)
+    sousAgence: SousAgence
 
     @Column()
-    age: number
+    isAdmin: boolean = false
 
 }
