@@ -1,16 +1,15 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne} from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne } from "typeorm"
 import { Client } from "./Client";
 import { Paiement } from "./Paiement";
 import { Devise } from "./Devise"
 import { Pays } from "./Pays";
 
-// DataTypeNotSupportedError: Data type "enum" in "Transaction.statut" is not supported by "sqlite" database.
-/*export enum StatutTransaction {
+export enum StatutTransaction {
     TRANSMITTED = "transmitted",
     PAYABLE = "payable",
     PAID = "paid",
     CANCELED = "cancelled",
-}*/
+}
 
 @Entity()
 export class Transaction {
@@ -30,9 +29,8 @@ export class Transaction {
     @Column({ type: "decimal", precision: 2 })
     montantTotal: number
 
-    //@Column({ type: "enum", enum: StatutTransaction, default: StatutTransaction.TRANSMITTED })
-    @Column()
-    statut: string = 'transmitted'
+    @Column({ type: "enum", enum: StatutTransaction, default: StatutTransaction.TRANSMITTED })
+    statut: string
 
     @ManyToOne(() => Client, (client) => client.transactionsEmises, { nullable: false })
     emetteur: Client

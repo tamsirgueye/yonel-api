@@ -1,6 +1,6 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
-import { Transaction } from "../entity/Transaction"
+import { StatutTransaction, Transaction } from "../entity/Transaction"
 import { StatusCodes } from "http-status-codes";
 import { Client } from "../entity/Client";
 import { Paiement } from "../entity/Paiement";
@@ -137,7 +137,7 @@ export class TransactionController {
 
                     return this.transactionRepository.save(transaction).then(transaction => {
                         setTimeout(() => {
-                            transaction.statut = "payable"
+                            transaction.statut = StatutTransaction.PAYABLE
                             this.transactionRepository.save(transaction)
                         }, 40000)
 
@@ -205,7 +205,7 @@ export class TransactionController {
         paiement.typePieceIdentite = request.body.typePieceIdentite
         paiement.numeroPieceIdentite = request.body.numeroPieceIdentite
         transaction.paiement = paiement
-        transaction.statut = "paid"
+        transaction.statut = StatutTransaction.PAID
 
         return this.transactionRepository.save(transaction).then(transaction => {
             return transaction
@@ -239,7 +239,7 @@ export class TransactionController {
             return { message: "Transaction déjà payée" }
         }
 
-        transaction.statut = "cancelled"
+        transaction.statut = StatutTransaction.CANCELED
         return this.transactionRepository.save(transaction)
     }
 
