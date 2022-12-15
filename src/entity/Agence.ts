@@ -1,11 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
 import { SousAgence } from "./SousAgence";
 
-// DataTypeNotSupportedError: Data type "enum" in "Agence.statut" is not supported by "sqlite" database.
-/*export enum statutAgence {
+export enum StatutAgence {
     ACTIF = "actif",
     INACTIF = "inactif"
-}*/
+}
 
 @Entity()
 export class Agence {
@@ -16,9 +15,8 @@ export class Agence {
     @Column()
     nom: string
 
-    //@Column("enum", { enum: statutAgence, default: statutAgence.ACTIF })
-    @Column()
-    statut: string = 'actif'
+    @Column("enum", { enum: StatutAgence, default: StatutAgence.ACTIF })
+    statut: string
 
     @Column()
     balance: number
