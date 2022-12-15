@@ -1,17 +1,23 @@
 import * as express from "express"
 import * as bodyParser from "body-parser"
+import * as cors from "cors"
 import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
 import { Routes } from "./routes"
+
 require('dotenv').config()
 
 const PORT = process.env.APP_PORT || 3000
 
 AppDataSource.initialize().then(async () => {
 
+    const corsOptions = {
+        origin: `{${process.env.URL_CLIENT}}`
+    };
     // create express app
     const app = express()
     app.use(bodyParser.json())
+    app.use(cors(corsOptions))
 
     app["get"]('/', (req, res) => res.send("<h1 style='text-align: center;background-color: darkgray'>Api</h1>"))
 
