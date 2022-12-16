@@ -99,8 +99,8 @@ export class AgenceController {
     }
 
     async addUser(request: Request, response: Response, next: NextFunction) {
-        const idAgence = request.body.idAgence
-        const idUser = request.body.idUser
+        const idAgence = parseInt(request.body.idAgence)
+        const idUser = parseInt(request.body.idUser)
 
         if(!idAgence) {
             response.status(StatusCodes.BAD_REQUEST)

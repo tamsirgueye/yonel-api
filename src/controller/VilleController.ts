@@ -70,7 +70,7 @@ export class VilleController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idPays = request.body.idPays
+        const idPays = parseInt(request.body.idPays)
         if(!idPays) {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "Le pays est obligatoire" }

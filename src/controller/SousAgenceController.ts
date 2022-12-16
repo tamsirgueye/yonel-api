@@ -80,8 +80,8 @@ export class SousAgenceController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idAgence = request.body.idAgence
-        const idVille = request.body.idVille
+        const idAgence = parseInt(request.body.idAgence)
+        const idVille = parseInt(request.body.idVille)
         if(!(idAgence && idVille)) {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "Agence et ville obligatoire" }
@@ -161,8 +161,8 @@ export class SousAgenceController {
     }
 
     async addUser(request: Request, response: Response, next: NextFunction) {
-        const idSousAgence = request.body.idSousAgence
-        const idUser = request.body.idUser
+        const idSousAgence = parseInt(request.body.idSousAgence)
+        const idUser = parseInt(request.body.idUser)
 
         if(!idSousAgence) {
             response.status(StatusCodes.BAD_REQUEST)

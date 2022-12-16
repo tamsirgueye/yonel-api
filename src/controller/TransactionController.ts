@@ -88,12 +88,12 @@ export class TransactionController {
      * @param next
      */
     async save(request: Request, response: Response, next: NextFunction) {
-        const idEmetteur = request.body.idEmetteur
-        const idRecepteur = request.body.idRecepteur
-        const idPaysOrigine = request.body.idPaysOrigine
-        const idPaysDestination = request.body.idPaysDestination
-        const idDeviseOrigine = request.body.idDeviseOrigine
-        const idDeviseDestination = request.body.idDeviseDestination
+        const idEmetteur = parseInt(request.body.idEmetteur)
+        const idRecepteur = parseInt(request.body.idRecepteur)
+        const idPaysOrigine = parseInt(request.body.idPaysOrigine)
+        const idPaysDestination = parseInt(request.body.idPaysDestination)
+        const idDeviseOrigine = parseInt(request.body.idDeviseOrigine)
+        const idDeviseDestination = parseInt(request.body.idDeviseDestination)
 
         if(!(idEmetteur && idRecepteur && idPaysOrigine && idPaysDestination && idDeviseOrigine && idDeviseDestination)) {
             response.status(StatusCodes.BAD_REQUEST)
@@ -202,7 +202,7 @@ export class TransactionController {
      * @param next
      */
     async pay(request: Request, response: Response, next: NextFunction) {
-        const idTransaction = request.body.idTransaction
+        const idTransaction = parseInt(request.body.idTransaction)
         if(!idTransaction) {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "La transaction est requise" }
