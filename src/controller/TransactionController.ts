@@ -6,6 +6,7 @@ import { Client } from "../entity/Client";
 import { Paiement } from "../entity/Paiement";
 import { Pays } from "../entity/Pays";
 import { Devise } from "../entity/Devise";
+import { User } from "../entity/User";
 
 export class TransactionController {
 
@@ -94,7 +95,12 @@ export class TransactionController {
         const idDeviseOrigine = request.body.idDeviseOrigine
         const idDeviseDestination = request.body.idDeviseDestination
 
-        if(idEmetteur == idRecepteur) {
+        if(!(idEmetteur && idRecepteur && idPaysOrigine && idPaysDestination && idDeviseOrigine && idDeviseDestination)) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "Il y a des données manquantes" }
+        }
+
+        if(idEmetteur && idRecepteur && idEmetteur == idRecepteur) {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "Émetteur et récepteur ne peuvent pas être identiques" }
         }
@@ -127,7 +133,7 @@ export class TransactionController {
                         { id: idDeviseOrigine },
                         { id: idDeviseDestination }
                     ]
-                }).then(devises => {
+                }).then(async devises => {
                     // Tester si on a une devise d’origine et de destination
                     if(!(devises.length == 2 || (devises.length == 1 && idDeviseOrigine == idDeviseDestination))) {
                         response.status(StatusCodes.NOT_FOUND)
@@ -144,6 +150,7 @@ export class TransactionController {
                     transaction.montantReception = request.body.montantReception
                     transaction.frais = request.body.frais
                     transaction.montantTotal = request.body.montantTotal
+                    transaction.userCreateur = await AppDataSource.getRepository(User).findOneBy({ id: request.user.user_id })
 
                     return this.transactionRepository.save(transaction).then(transaction => {
                         setTimeout(() => {

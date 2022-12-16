@@ -3,6 +3,7 @@ import { Client } from "./Client";
 import { Paiement } from "./Paiement";
 import { Devise } from "./Devise"
 import { Pays } from "./Pays";
+import { User } from "./User";
 
 export enum StatutTransaction {
     TRANSMITTED = "transmitted",
@@ -52,5 +53,8 @@ export class Transaction {
 
     @ManyToOne(() => Pays, (pays) => pays.transactionsDestination, { nullable: false })
     paysDestination: Pays
+
+    @ManyToOne(() => User, (user) => user.transactionsCrees)
+    userCreateur: User
 
 }

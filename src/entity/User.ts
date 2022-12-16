@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm"
 import { Agence } from "./Agence";
 import { SousAgence } from "./SousAgence";
+import { Transaction } from "./Transaction";
 
 @Entity()
 export class User {
@@ -22,5 +23,8 @@ export class User {
 
     @Column()
     isAdmin: boolean = false
+
+    @OneToMany(() => Transaction, (transaction) => transaction.userCreateur)
+    transactionsCrees: Transaction[]
 
 }
