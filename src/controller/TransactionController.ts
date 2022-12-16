@@ -202,9 +202,14 @@ export class TransactionController {
      * @param next
      */
     async pay(request: Request, response: Response, next: NextFunction) {
+        const idTransaction = request.body.idTransaction
+        if(!idTransaction) {
+            response.status(StatusCodes.BAD_REQUEST)
+            return { message: "La transaction est requise" }
+        }
         const transaction = await this.transactionRepository
             .createQueryBuilder('t')
-            .where({ id: request.body.idTransaction })
+            .where({ id: idTransaction })
             .leftJoinAndSelect('t.client', 'c')
             .leftJoinAndSelect('t.paiement', 'p')
             .getOne()
