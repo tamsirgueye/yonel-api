@@ -1,28 +1,34 @@
-import {UserController} from "../controller/UserController";
+import { UserController } from "../controller/UserController";
+import { UserAccess } from "../Middleware/UserAccess";
 
 export const userRoutes = [{
     method: "get",
     route: "/users",
     controller: UserController,
-    action: "all"
+    action: "all",
+    middleware: UserAccess.canGetCollection
 }, {
     method: "get",
     route: "/users/:id",
     controller: UserController,
-    action: "one"
+    action: "one",
+    middleware: UserAccess.canGet
 }, {
     method: "post",
     route: "/users",
     controller: UserController,
-    action: "save"
+    action: "save",
+    middleware: UserAccess.canCreate
 }, {
     method: "delete",
     route: "/users/:id",
     controller: UserController,
-    action: "remove"
+    action: "remove",
+    middleware: UserAccess.canRemove
 }, {
     method: "put",
     route: "/users/:id",
     controller: UserController,
-    action: "update"
+    action: "update",
+    middleware: UserAccess.canUpdate
 }]

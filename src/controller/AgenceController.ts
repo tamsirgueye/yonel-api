@@ -3,6 +3,11 @@ import { NextFunction, Request, Response } from "express"
 import { Agence } from "../entity/Agence"
 import { StatusCodes } from "http-status-codes";
 import { User } from "../entity/User";
+import * as bcrypt from "bcrypt"
+
+const saltRounds = 10;
+// generate salt to hash password
+const salt = bcrypt.genSalt(saltRounds);
 
 export class AgenceController {
 
@@ -111,12 +116,13 @@ export class AgenceController {
         if(!idUser) {
             let user = new User()
             user.login = request.body.login
-            user.password = request.body.password
+            user.password = await bcrypt.hash(request.body.password, await salt)
             user.agence = agence
 
             return this.userRepository.save(user).then(user => {
                 response.status(StatusCodes.CREATED)
-                return user
+                const { password, ...userClean } = user
+                return userClean
             }).catch(e => {
                 response.status(StatusCodes.BAD_REQUEST)
                 return { message: "Vérifiez les informations de l'utilisateur" }

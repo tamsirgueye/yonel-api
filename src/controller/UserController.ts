@@ -2,6 +2,11 @@ import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
 import { User } from "../entity/User"
 import { StatusCodes } from "http-status-codes";
+import * as bcrypt from "bcrypt"
+
+const saltRounds = 10;
+// generate salt to hash password
+const salt = bcrypt.genSalt(saltRounds);
 
 export class UserController {
 
@@ -29,11 +34,12 @@ export class UserController {
 
         let user = new User()
         user.login = request.body.login
-        user.password = request.body.password
+        user.password = await bcrypt.hash(request.body.password, await salt)
 
         return this.userRepository.save(user).then(user => {
             response.status(StatusCodes.CREATED)
-            return user
+            const { password, ...userClean } = user
+            return userClean
         }).catch(e => {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les données" }
@@ -59,10 +65,13 @@ export class UserController {
         }
 
         userToUpdate.login = request.body.login
-        userToUpdate.password = request.body.password
+        if(request.body.password) {
+            userToUpdate.password = await bcrypt.hash(request.body.password, await salt)
+        }
 
         return this.userRepository.save(userToUpdate).then(userUpdated => {
-            return userUpdated
+            const { password, ...userClean } = userUpdated
+            return userClean
         }).catch(e => {
             response.status(StatusCodes.BAD_REQUEST)
             return { message: "Vérifiez les donnée envoyées" }

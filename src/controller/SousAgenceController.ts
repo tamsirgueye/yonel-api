@@ -5,6 +5,11 @@ import { Agence } from "../entity/Agence"
 import { Ville } from "../entity/Ville"
 import { StatusCodes } from "http-status-codes"
 import { User } from "../entity/User";
+import * as bcrypt from "bcrypt"
+
+const saltRounds = 10;
+// generate salt to hash password
+const salt = bcrypt.genSalt(saltRounds);
 
 export class SousAgenceController {
 
@@ -173,15 +178,16 @@ export class SousAgenceController {
         if(!idUser) {
             let user = new User()
             user.login = request.body.login
-            user.password = request.body.password
+            user.password = await bcrypt.hash(request.body.password, await salt)
             user.sousAgence = sousAgence
 
             return this.userRepository.save(user).then(user => {
                 response.status(StatusCodes.CREATED)
-                return user
+                const { password, ...userClean } = user
+                return userClean
             }).catch(e => {
                 response.status(StatusCodes.BAD_REQUEST)
-                return { message: "Veuillez renseigner l'utilisateur" }
+                return { message: "Vérifiez les données" }
             })
         }
 
