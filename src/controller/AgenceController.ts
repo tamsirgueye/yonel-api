@@ -40,7 +40,7 @@ export class AgenceController {
 
         let agence = new Agence()
         agence.nom = request.body.nom
-        // agence.balance = request.body.balance
+        agence.balance = request.body.balance
 
         return this.agenceRepository.save(agence).then(agence => {
             response.status(StatusCodes.CREATED)
@@ -86,7 +86,7 @@ export class AgenceController {
         }
 
         agenceToUpdate.nom = request.body.nom
-        // agenceToUpdate.balance = request.body.balance
+        agenceToUpdate.balance = request.body.balance
         agenceToUpdate.statut = request.body.statut
 
         return this.agenceRepository.save(agenceToUpdate).then(agenceUpdated => {
