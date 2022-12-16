@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { User } from "../entity/User";
 import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken"
+import {AppDataSource} from "../data-source";
 
 export class JwtAuth {
 
@@ -18,7 +19,7 @@ export class JwtAuth {
         return { user: userClean, token: token };
     }
 
-    static verifyToken(request: Request, response: Response, next: NextFunction) {
+    static async verifyToken(request: Request, response: Response, next: NextFunction) {
         if(request.path === '/login' /*|| (request.path === '/users' && request.method === 'POST')*/)
             return next();
 
@@ -33,6 +34,11 @@ export class JwtAuth {
 
         try {
             request.user = jwt.verify(token, process.env.TOKEN_KEY);
+            if(! await AppDataSource.getRepository(User).findOneBy({ id: request.user.user_id })) {
+                response.status(StatusCodes.UNAUTHORIZED)
+                response.json({ message: "Vous n'êtes plus autorisés à accéder à l'api" })
+                return
+            }
             return next();
         } catch (err) {
             response.status(StatusCodes.UNAUTHORIZED)
