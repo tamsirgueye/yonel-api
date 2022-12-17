@@ -174,8 +174,6 @@ export class TransactionController {
                     agence.balance -= transaction.montantTotal
                     transaction.userCreateur = user
 
-                    console.log(agence)
-
                     return this.transactionRepository.save(transaction).then(transaction => {
                         // Appliquez le débit de la balance si la transaction a été bien sauvegardée
                         this.agenceRepository.save(agence)
