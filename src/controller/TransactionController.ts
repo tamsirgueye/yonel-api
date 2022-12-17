@@ -156,7 +156,7 @@ export class TransactionController {
                     const user = await this.userRepository
                         .createQueryBuilder("u")
                         .leftJoinAndSelect("u.sousAgence", "sousAgence")
-                        .where({ id: request.body.user_id })
+                        .where({ id: request.user.user_id })
                         .getOne()
                     let agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
                     if(agence.balance < transaction.montantTotal) {
@@ -214,7 +214,7 @@ export class TransactionController {
             const user = await this.userRepository
                 .createQueryBuilder("u")
                 .leftJoinAndSelect("u.sousAgence", "sousAgence")
-                .where({ id: request.body.user_id })
+                .where({ id: request.user.user_id })
                 .getOne()
             agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
         }
@@ -305,7 +305,7 @@ export class TransactionController {
         const user = await this.userRepository
             .createQueryBuilder("u")
             .leftJoinAndSelect("u.sousAgence", "sousAgence")
-            .where({ id: request.body.user_id })
+            .where({ id: request.user.user_id })
             .getOne()
         agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
 
