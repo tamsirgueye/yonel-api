@@ -13,6 +13,16 @@ require('dotenv').config()
 
 const PORT = process.env.APP_PORT || 3000
 
+const saltRounds = 10
+// generate salt to hash password
+const salt = bcrypt.genSalt(saltRounds)
+
+salt.then(salt => {
+    bcrypt.hash("pass", salt).then(passHash => {
+        console.log("Mot de passe crypté\n\tpass => " + passHash)
+    })
+})
+
 const userRepository = AppDataSource.getRepository(User)
 
 AppDataSource.initialize().then(async () => {
