@@ -166,6 +166,8 @@ export class TransactionController {
                     agence.balance -= transaction.montantTotal
                     transaction.userCreateur = user
 
+                    console.log(agence)
+
                     return this.transactionRepository.save(transaction).then(transaction => {
                         // Appliquez le débit de la balance si la transaction a été bien sauvegardée
                         this.agenceRepository.save(agence)
@@ -244,7 +246,6 @@ export class TransactionController {
         const transaction = await this.transactionRepository
             .createQueryBuilder('t')
             .where({ id: idTransaction })
-            .leftJoinAndSelect('t.client', 'c')
             .leftJoinAndSelect('t.paiement', 'p')
             .getOne()
         if (!transaction) {
@@ -288,9 +289,6 @@ export class TransactionController {
             .createQueryBuilder('t')
             .where({ id: request.params.id })
             .leftJoinAndSelect('t.paiement', 'paiement')
-            .leftJoinAndSelect('t.client', 'client')
-            .leftJoinAndSelect('t.devise', 'devise')
-            .leftJoinAndSelect('t.pays', 'pays')
             .getOne()
         if (!transaction) {
             response.status(StatusCodes.NOT_FOUND)
@@ -299,6 +297,11 @@ export class TransactionController {
 
         if(transaction.paiement) {
             return { message: "Transaction déjà payée" }
+        }
+
+        if(transaction.statut == StatutTransaction.CANCELED) {
+            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            return { message: "transaction Déjà annulée" }
         }
 
         let agence

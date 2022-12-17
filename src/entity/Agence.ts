@@ -18,7 +18,7 @@ export class Agence {
     @Column({ type: "enum", enum: StatutAgence, default: StatutAgence.ACTIF })
     statut: string
 
-    @Column({ type: "decimal", precision: 17, scale: 6, default: 0 })
+    @Column({ type: "float", precision: 10, scale: 3, default: 0 })
     balance: number
 
     @OneToMany(() => SousAgence, (sousAgence) => sousAgence.agence)
