@@ -28,7 +28,7 @@ const userRepository = AppDataSource.getRepository(User)
 AppDataSource.initialize().then(async () => {
 
     const corsOptions = {
-        origin: `{${process.env.URL_CLIENT}}`
+        origin: process.env.URL_CLIENT
     };
     // create express app
     const app = express()
