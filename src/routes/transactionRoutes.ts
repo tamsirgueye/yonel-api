@@ -1,4 +1,5 @@
 import { TransactionController } from "../controller/TransactionController";
+import { TransactionAccess } from "../Middleware/TransactionAccess";
 
 export const transactionRoutes = [{
     method: "get",
@@ -19,20 +20,24 @@ export const transactionRoutes = [{
     method: "post",
     route: "/transactions",
     controller: TransactionController,
-    action: "save"
+    action: "save",
+    middleware: TransactionAccess.hasSousAgence
 }, {
     method: "delete",
     route: "/transactions/:id",
     controller: TransactionController,
-    action: "remove"
+    action: "remove",
+    middleware: TransactionAccess.hasSousAgence
 }, {
     method: "post",
     route: "/transactions/payer",
     controller: TransactionController,
-    action: "pay"
+    action: "pay",
+    middleware: TransactionAccess.hasSousAgence
 }, {
     method: "put",
     route: "/transactions/annuler/:id",
     controller: TransactionController,
-    action: "cancel"
+    action: "cancel",
+    middleware: TransactionAccess.hasSousAgence
 }]
