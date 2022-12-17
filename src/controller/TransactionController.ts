@@ -25,7 +25,15 @@ export class TransactionController {
      * @param next
      */
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.transactionRepository.find()
+        return this.transactionRepository
+            .createQueryBuilder("t")
+            .leftJoinAndSelect("t.deviseOrigine", "do")
+            .leftJoinAndSelect("t.deviseDestination", "dd")
+            .leftJoinAndSelect("t.paysOrigine", "po")
+            .leftJoinAndSelect("t.paysDestination", "pd")
+            .leftJoinAndSelect("t.emetteur", "em")
+            .leftJoinAndSelect("t.recepteur", "re")
+            .getMany()
     }
 
     /**
