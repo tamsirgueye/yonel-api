@@ -1,6 +1,12 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { Transaction } from "./Transaction";
 
+export enum TypePieceIdentite {
+    CNI = "cni",
+    PASSPORT = "passport",
+    PERMIS = "permis"
+}
+
 @Entity()
 export class Paiement {
     @PrimaryGeneratedColumn()
@@ -12,7 +18,7 @@ export class Paiement {
     @Column()
     nomCompletRecepteur: string
 
-    @Column()
+    @Column({ type: "enum", enum: TypePieceIdentite })
     typePieceIdentite: string
 
     @Column()
