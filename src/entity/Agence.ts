@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
 import { SousAgence } from "./SousAgence";
-import { User } from "./User";
 
 export enum StatutAgence {
     ACTIF = "actif",
@@ -25,6 +24,4 @@ export class Agence {
     @OneToMany(() => SousAgence, (sousAgence) => sousAgence.agence)
     sousAgences: SousAgence[]
 
-    @OneToMany(() => User, (user) => user.agence)
-    users: User[]
 }

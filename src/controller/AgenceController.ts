@@ -98,44 +98,4 @@ export class AgenceController {
 
     }
 
-    async addUser(request: Request, response: Response, next: NextFunction) {
-        const idAgence = parseInt(request.body.idAgence)
-        const idUser = parseInt(request.body.idUser)
-
-        if(!idAgence) {
-            response.status(StatusCodes.BAD_REQUEST)
-            return { message: "L'agence est obligatoire" }
-        }
-
-        const agence = await this.agenceRepository.findOneBy({ id: idAgence })
-        if(!agence) {
-            response.status(StatusCodes.NOT_FOUND)
-            return { message: "Agence introuvable" }
-        }
-
-        if(!idUser) {
-            let user = new User()
-            user.login = request.body.login
-            user.password = await bcrypt.hash(request.body.password, await salt)
-            user.agence = agence
-
-            return this.userRepository.save(user).then(user => {
-                response.status(StatusCodes.CREATED)
-                const { password, ...userClean } = user
-                return userClean
-            }).catch(e => {
-                response.status(StatusCodes.BAD_REQUEST)
-                return { message: "Vérifiez les informations de l'utilisateur" }
-            })
-        }
-
-        return this.userRepository.findOneBy({ id: idUser }).then(user => {
-            user.agence = agence
-            return this.userRepository.save(user)
-        }).catch(e => {
-            response.status(StatusCodes.BAD_REQUEST)
-            return { message: "Utilisateur introuvable" }
-        })
-    }
-
 }

@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm"
-import { Agence } from "./Agence";
 import { SousAgence } from "./SousAgence";
 import { Transaction } from "./Transaction";
 
@@ -14,9 +13,6 @@ export class User {
 
     @Column({ select: false })
     password: string
-
-    @ManyToOne(() => Agence, (agence) => agence.users)
-    agence: Agence
 
     @ManyToOne(() => SousAgence, (sousAgence) => sousAgence.users)
     sousAgence: SousAgence

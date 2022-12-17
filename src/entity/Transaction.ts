@@ -54,7 +54,7 @@ export class Transaction {
     @ManyToOne(() => Pays, (pays) => pays.transactionsDestination, { nullable: false })
     paysDestination: Pays
 
-    @ManyToOne(() => User, (user) => user.transactionsCrees)
+    @ManyToOne(() => User, (user) => user.transactionsCrees, { nullable: false })
     userCreateur: User
 
 }

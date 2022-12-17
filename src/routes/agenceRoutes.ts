@@ -25,9 +25,4 @@ export const agenceRoutes = [{
     route: "/agences/:id",
     controller: AgenceController,
     action: "update"
-}, {
-    method: "post",
-    route: "/agences/ajouter-utilisateur",
-    controller: AgenceController,
-    action: "addUser"
 }]

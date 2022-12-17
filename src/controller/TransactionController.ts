@@ -7,6 +7,7 @@ import { Paiement } from "../entity/Paiement";
 import { Pays } from "../entity/Pays";
 import { Devise } from "../entity/Devise";
 import { User } from "../entity/User";
+import { Agence } from "../entity/Agence";
 
 export class TransactionController {
 
@@ -14,6 +15,8 @@ export class TransactionController {
     private clientRepository = AppDataSource.getRepository(Client)
     private paysRepository = AppDataSource.getRepository(Pays)
     private deviseRepository = AppDataSource.getRepository(Devise)
+    private agenceRepository = AppDataSource.getRepository(Agence)
+    private userRepository = AppDataSource.getRepository(User)
 
     /**
      * Récupère toutes les transactions
@@ -150,9 +153,23 @@ export class TransactionController {
                     transaction.montantReception = request.body.montantReception
                     transaction.frais = request.body.frais
                     transaction.montantTotal = request.body.montantTotal
-                    transaction.userCreateur = await AppDataSource.getRepository(User).findOneBy({ id: request.user.user_id })
+                    const user = await this.userRepository
+                        .createQueryBuilder("u")
+                        .leftJoinAndSelect("u.sousAgence", "sousAgence")
+                        .where({ id: request.body.user_id })
+                        .getOne()
+                    let agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
+                    if(agence.balance < transaction.montantTotal) {
+                        response.status(StatusCodes.SERVICE_UNAVAILABLE)
+                        return { message: "Balance insuffisante" }
+                    }
+                    agence.balance -= transaction.montantTotal
+                    transaction.userCreateur = user
 
                     return this.transactionRepository.save(transaction).then(transaction => {
+                        // Appliquez le débit de la balance si la transaction a été bien sauvegardée
+                        this.agenceRepository.save(agence)
+
                         setTimeout(() => {
                             transaction.statut = StatutTransaction.PAYABLE
                             this.transactionRepository.save(transaction)
@@ -191,8 +208,25 @@ export class TransactionController {
             response.status(StatusCodes.NOT_FOUND)
             return { message: "Transaction introuvable" }
         }
-        await this.transactionRepository.remove(transactionToRemove)
-        response.sendStatus(StatusCodes.NO_CONTENT)
+
+        let agence
+        if(transactionToRemove.statut != StatutTransaction.PAID) {
+            const user = await this.userRepository
+                .createQueryBuilder("u")
+                .leftJoinAndSelect("u.sousAgence", "sousAgence")
+                .where({ id: request.body.user_id })
+                .getOne()
+            agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
+        }
+
+        this.transactionRepository.remove(transactionToRemove).then(transaction => {
+            agence.balance += transaction.montantTotal
+            this.agenceRepository.save(agence)
+            response.sendStatus(StatusCodes.NO_CONTENT)
+        }).catch(e => {
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR)
+            return { message: "Problème rencontré lors de la suppression de la transaction" }
+        })
     }
 
     /**
@@ -219,7 +253,13 @@ export class TransactionController {
         }
 
         if(transaction.paiement) {
+            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
             return { message: "Transaction déjà payée" }
+        }
+
+        if(transaction.statut == StatutTransaction.CANCELED) {
+            response.status(StatusCodes.UNPROCESSABLE_ENTITY)
+            return { message: "Cette transaction est annulée"}
         }
 
         let paiement = new Paiement()
@@ -261,8 +301,23 @@ export class TransactionController {
             return { message: "Transaction déjà payée" }
         }
 
+        let agence
+        const user = await this.userRepository
+            .createQueryBuilder("u")
+            .leftJoinAndSelect("u.sousAgence", "sousAgence")
+            .where({ id: request.body.user_id })
+            .getOne()
+        agence = await this.agenceRepository.findOneBy({ sousAgences: user.sousAgence })
+
         transaction.statut = StatutTransaction.CANCELED
-        return this.transactionRepository.save(transaction)
+        return this.transactionRepository.save(transaction).then(transaction => {
+            agence.balance += transaction.montantTotal
+            this.agenceRepository.save(agence)
+            return transaction
+        }).catch(e => {
+            response.status(StatusCodes.INTERNAL_SERVER_ERROR)
+            return { message: "Échec de l'annulation de la transaction" }
+        })
     }
 
 }
